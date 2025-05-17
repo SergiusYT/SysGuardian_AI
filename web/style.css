@@ -1,0 +1,596 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #030100;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background-light {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Punto de inicio: centro de la pantalla */
+  border-radius: 50%;
+  filter: blur(150px);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+  animation-timing-function: ease-in-out;
+}
+
+#light1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #0084ff, transparent 80%);
+  animation: float1 45s infinite alternate;
+}
+
+#light2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #ff0055, transparent 80%);
+  animation: float2 60s infinite alternate;
+}
+
+#light3 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #ebc313, transparent 80%);
+  animation: float3 50s infinite alternate;
+}
+
+/* Movimiento desde el centro, en todas direcciones */
+@keyframes float1 {
+  0%   { transform: translate(-50%, -50%) translate(-40vw, -30vh); }
+  25%  { transform: translate(-50%, -50%) translate(30vw, -40vh); }
+  50%  { transform: translate(-50%, -50%) translate(40vw, 30vh); }
+  75%  { transform: translate(-50%, -50%) translate(-30vw, 40vh); }
+  100% { transform: translate(-50%, -50%) translate(-40vw, -30vh); }
+}
+
+@keyframes float2 {
+  0%   { transform: translate(-50%, -50%) translate(30vw, -35vh); }
+  25%  { transform: translate(-50%, -50%) translate(-25vw, -25vh); }
+  50%  { transform: translate(-50%, -50%) translate(20vw, 35vh); }
+  75%  { transform: translate(-50%, -50%) translate(-30vw, 30vh); }
+  100% { transform: translate(-50%, -50%) translate(30vw, -35vh); }
+}
+
+@keyframes float3 {
+  0%   { transform: translate(-50%, -50%) translate(0vw, 40vh); }
+  25%  { transform: translate(-50%, -50%) translate(45vw, 10vh); }
+  50%  { transform: translate(-50%, -50%) translate(-35vw, -10vh); }
+  75%  { transform: translate(-50%, -50%) translate(10vw, -40vh); }
+  100% { transform: translate(-50%, -50%) translate(0vw, 40vh); }
+}
+
+
+/* Animación de escaneo láser horizontal */
+@keyframes scan {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Brillo pulsante suave */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 59, 59, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
+  }
+}
+
+#chat-logo {
+  text-align: center;
+  padding: 15px 0 0;
+  display: none;
+  animation: showLogo 0.5s ease-out forwards;
+}
+
+#chat-logo img {
+  height: 40px;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+}
+
+/* Animación de aparición suave con escala */
+@keyframes showLogo {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Default */
+.welcome-logo {
+  position: fixed;
+  top: calc(24% - 180px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out;
+}
+
+.welcome-logo img {
+  width: clamp(130px, 18vw, 240px);
+  height: auto;
+  animation: multicolorGlow 3s infinite ease-in-out,
+             pulseLogo 3s infinite ease-in-out;
+}
+
+@keyframes multicolorGlow {
+  0% {
+    filter:
+      drop-shadow(0 0 6px rgba(255, 255, 0, 0.7))   /* Amarillo */
+      drop-shadow(0 0 12px rgba(255, 255, 0, 0.4));
+  }
+  33% {
+    filter:
+      drop-shadow(0 0 6px rgba(39, 120, 241, 0.86))     /* Azul */
+      drop-shadow(0 0 12px rgba(0, 170, 255, 0.53));
+  }
+  66% {
+    filter:
+      drop-shadow(0 0 6px rgba(255, 0, 0, 0.738))     /* Rojo */
+      drop-shadow(0 0 12px rgba(255, 0, 0, 0.567));
+  }
+  100% {
+    filter:
+      drop-shadow(0 0 6px rgba(255, 255, 0, 0.7))   /* Vuelve al Amarillo */
+      drop-shadow(0 0 12px rgba(255, 255, 0, 0.4));
+  }
+}
+
+
+@keyframes pulseLogo {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.welcome-logo.fade-out {
+  opacity: 0;
+}
+
+.welcome-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  padding: 40px 60px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: clamp(1rem, 2.3vw, 1.7rem);  
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+  animation: scan 4s linear infinite, pulseGlow 3s ease-in-out infinite;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.227) 0%,
+    rgba(64, 63, 63, 0.789) 50%,
+    rgba(0, 0, 0, 0.227) 100%
+  );
+  background-size: 200% 100%;
+  backdrop-filter: blur(10px);
+}
+
+.welcome-message .subtext {
+  font-size: clamp(0.8rem, 2vw, 1rem);  
+  font-style: italic;
+  margin-top: 10px;
+  opacity: 0.8;
+  color: #ffffffb2;
+  text-shadow: 0 0 5px rgba(64, 63, 63, 0.789);
+}
+
+.welcome-message.fade-out {
+  opacity: 0;
+}
+
+/* 🔽 Pantallas medianas */
+@media (max-height: 800px) {
+  .welcome-logo {
+    top: calc(26% - 180px);
+  }
+
+  .welcome-logo img {
+    width: clamp(115px, 15vw, 240px);
+  }
+
+  .welcome-message {
+    font-size: clamp(0.9rem, 2vw, 1.5rem);
+  }
+
+  .welcome-message .subtext {
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+  }
+}
+
+@media (max-height: 750px) {
+  .welcome-logo {
+    top: calc(29% - 180px);
+  }
+
+  .welcome-logo img {
+    width: clamp(115px, 14vw, 230px);
+  }
+
+  .welcome-message {
+    font-size: clamp(0.9rem, 2vw, 1.5rem);
+  }
+
+  .welcome-message .subtext {
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+  }
+}
+
+
+/* 🔽 Pantallas pequeñas */
+@media (max-height: 630px) {
+  .welcome-logo {
+    top: calc(35% - 180px);
+  }
+
+  .welcome-logo img {
+    width: clamp(100px, 13vw, 210px);
+  }
+
+  .welcome-message {
+    font-size: clamp(0.8rem, 1.8vw, 1.3rem);
+  }
+
+  .welcome-message .subtext {
+    font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+  }
+}
+
+/* 🔽 Muy pequeñas */
+@media (max-height: 500px) {
+  .welcome-logo {
+    top: calc(36% - 130px);
+  }
+
+  .welcome-logo img {
+    width: clamp(90px, 11vw, 200px);
+  }
+
+  .welcome-message {
+    font-size: clamp(0.7rem, 1.5vw, 1.1rem);
+  }
+
+  .welcome-message .subtext {
+    font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+  }
+}
+
+
+
+
+
+#chat-container {
+  width: 90%;
+  max-width: 1100px;
+  background: rgba(255, 255, 255, 0.126);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+  z-index: 1;
+  position: relative;
+}
+  
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;           
+  flex-direction: column; 
+}
+
+/* Webkit (Chrome, Edge, Opera) */
+#chat::-webkit-scrollbar {
+  width: 8px;
+}
+
+#chat::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#chat::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+#chat::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+  
+  .bubble {
+    padding: 14px 20px;
+    margin: 10px 0;
+    border-radius: 18px;
+    max-width: 75%;
+    line-height: 1.6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    word-wrap: break-word;
+  }
+  
+  .user {
+    background: #ffffffb2;
+    color: #000000;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+    margin-right: 15px;
+  }
+  
+  .ai {
+    background: #0000003a;
+    color: white;
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+  }
+  
+  #error {
+    background: #ff4d4f;
+    color: white;
+  }
+  
+  #input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 5px solid #0000003a;
+    z-index: 12;
+  }
+  
+  #user-input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    background: #0000007f;
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-right: 10px;
+  }
+  
+  #send-button {
+    padding: 10px 24px;
+    background: #ffffffb2;
+    color: #000000;
+    border: #000000 1px solid;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s ease;
+  }
+  
+  .send-arrow {
+    transform: translateX(-10px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    font-size: 18px;
+  }
+  
+  #send-button:hover .send-arrow {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+
+  .bubble {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+
+  #typing-indicator {
+    padding: 10px;
+    color: #aaa;
+    font-style: italic;
+    text-align: left;
+  }
+  
+  .dot {
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    0%, 20% { opacity: 0 }
+    50% { opacity: 1 }
+    100% { opacity: 0 }
+  }
+  
+  .typing-cursor {
+    display: inline-block;
+    width: 10px;
+    height: 1em;
+    background-color: white;
+    margin-left: 2px;
+    animation: blink-cursor 1s steps(2, start) infinite;
+    vertical-align: bottom;
+  }
+  
+  @keyframes blink-cursor {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+
+  .bubble-container {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+    background-color: transparent; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+    overflow: hidden;
+  }
+  
+  /* Avatar del usuario con fondo */
+  .bubble-container:not(.writing):not(.done) .avatar {
+    background-color: #eee;
+  }
+  
+  /* Avatar de la IA transparente */
+  .bubble-container.done .avatar,
+  .bubble-container.writing .avatar {
+    background-color: transparent;
+  }
+  
+  
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  img.avatar-img {
+    transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+    opacity: 1;
+  }
+  
+  img.final-avatar {
+    animation: avatar-supernova 1.2s ease-out forwards;
+    transform-origin: center;
+    opacity: 0;
+    position: relative;
+    z-index: 1;
+  }
+  
+  @keyframes avatar-supernova {
+    0% {
+      transform: scale(0.8) rotate(-25deg);
+      filter: brightness(0.5) blur(3px);
+      opacity: 0;
+    }
+    30% {
+      transform: scale(1.4) rotate(10deg);
+      filter: brightness(2) drop-shadow(0 0 12px #00f0ff) blur(1px);
+      opacity: 1;
+    }
+    60% {
+      transform: scale(1.5) rotate(-5deg);
+      filter: brightness(1.3) drop-shadow(0 0 6px #00f0ff);
+    }
+    80% {
+      transform: scale(1.1);
+      filter: brightness(1.5) drop-shadow(0 0 10px #00f0ff);
+    }
+    100% {
+      transform: scale(1) rotate(0);
+      filter: brightness(1) drop-shadow(0 0 4px #00f0ff);
+      opacity: 1;
+    }
+  }
+  
+  .contenedor-avatar-msg {
+    position: fixed;
+    top: 20px;           /* Cambiado de bottom a top */
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+    animation: avatarFloatDown 0.5s ease-out;  /* Cambiamos la animación también */
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  .avatar-flotante {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    object-fit: cover;
+  }
+  
+  .mensaje-avatar-flotante {
+    background: #ffffffdd;
+    color: #333;
+    padding: 8px 14px;
+    border-radius: 18px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    backdrop-filter: blur(4px);
+  }
+  
+  .contenedor-avatar-msg.fade-out {
+    opacity: 0;
+  }
+  
+  @keyframes avatarFloatDown {
+    0% {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+
+  .terminal-sim {
+    background-color: #1e1e1e;
+    color: #00ff7f;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+    box-shadow: 0 0 8px rgba(0, 255, 127, 0.5);
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+  

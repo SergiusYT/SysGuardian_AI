@@ -1,0 +1,9 @@
+services:
+  sysguardian_ai:
+    build: .
+    container_name: sysguardian_ai_container
+    volumes:
+      - .:/app
+    restart: always
+    stdin_open: true
+    tty: true

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SysGuardian AI</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="img/logo_neon.ico" />
+</head>
+<body>
+  <div class="background-light" id="light1"></div>
+  <div class="background-light" id="light2"></div>
+  <div class="background-light" id="light3"></div>
+
+  <div id="chat-container">
+    <div class="welcome-logo">
+      <img src="img/logo_normal.png" alt="Logo de SysGuardian">
+    </div>
+    <div id="welcome" class="welcome-message">
+      <h1>Hola, <span id="user-name">Usuario</span> 👋</h1>
+      <p>¡Bienvenido a SysGuardian AI!</p>
+      <p class="subtext">¿En qué puedo ayudarte el día de hoy?</p>
+    </div>
+    <div id="chat-logo">
+      <img src="img/logotipo.png" alt="Logo de SysGuardian">
+    </div>    
+    <div id="chat"></div>
+    <div id="input-container">
+      <input type="text" id="user-input" placeholder="Escribe tu mensaje..." />
+      <button id="send-button">
+        <span class="send-text">Enviar</span>
+        <span class="send-arrow">➜</span>
+      </button>
+    </div>
+  </div>  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="/eel.js"></script>
+  <script src="app.js"></script>
+  <template id="ia-avatar-template">
+    <img src="img/logo_neon.png" alt="IA" class="ia-avatar">
+  </template>
+</body>
+</html>
