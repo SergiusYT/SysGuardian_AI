@@ -60,7 +60,7 @@ def obtener_mensaje_estado(tipo):
 
 
 client = OpenAI(
-    api_key="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",
+    api_key="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",
     base_url="https://openrouter.ai/api/v1"
 )
 
