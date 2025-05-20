@@ -1,7 +1,11 @@
+version: '3'
+
 services:
   sysguardian_ai:
     build: .
     container_name: sysguardian_ai_container
+    ports:
+      - "8000:8000"   # O el puerto que uses en eel.start()
     volumes:
       - .:/app
     restart: always

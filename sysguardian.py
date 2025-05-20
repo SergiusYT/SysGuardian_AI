@@ -11,6 +11,10 @@ from utils import script_generator
 from utils import system_monitor
 import random
 
+import platform
+
+sistema = platform.system()
+
 mensajes_estado = {
     "escribiendo": [
         "🧠 Pensando intensamente",
@@ -56,7 +60,7 @@ def obtener_mensaje_estado(tipo):
 
 
 client = OpenAI(
-    api_key="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",
+    api_key="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",
     base_url="https://openrouter.ai/api/v1"
 )
 
@@ -75,7 +79,7 @@ def necesita_datos_sistema(prompt):
         "bloqueo", "colapso", "sobrecalentamiento", "rendimiento bajo", "ralentización",
 
         # Procesos y tareas
-        "procesos", "programas activos", "servicios", "hilos", "tareas", "ejecución", "zombie",
+        "programas activos", "servicios", "hilos", "tareas", "ejecución", "zombie",
         "malware", "actividad sospechosa", "análisis de procesos", "procesos en segundo plano",
 
         # Sistema operativo y kernel
@@ -102,7 +106,26 @@ def necesita_datos_sistema(prompt):
         "monitor", "monitoreo", "status", "diagnóstico", "inspección", "supervisión",
         "estado del sistema", "informe del sistema"
     ]
-    return any(palabra in prompt.lower() for palabra in palabras_clave)
+    return any(re.search(rf'\b{re.escape(palabra)}\b', prompt, re.IGNORECASE) for palabra in palabras_clave)
+
+def es_tarea_automatizable(prompt):
+    acciones = [
+        "apagar", "reiniciar", "detener", "cerrar", "eliminar proceso", 
+        "terminar", "finalizar", "ejecutar", "matar proceso", 
+        "desactivar", "activar", "limpiar", "vaciar", "programar", 
+        "automatizar", "crear script", "generar script", "script"
+    ]
+    return any(palabra in prompt.lower() for palabra in acciones)
+
+
+def lenguaje_explicito_en_prompt(prompt):
+    lenguajes = [
+        "python", "bash", "shell", "sh", "batch", "bat", "powershell", "ps1", "cmd",
+        "json", "yaml", "yml", "xml", "html", "js", "javascript", "ts", "typescript",
+        "java", "c", "cpp", "c++", "cs", "go", "rust", "php", "sql",
+        "dockerfile", "makefile", "ini", "config"
+    ]
+    return any(re.search(rf"\b{re.escape(lang)}\b", prompt.lower()) for lang in lenguajes)
 
 
 
@@ -129,8 +152,33 @@ def enviar_mensaje_stream(prompt):
             eel.actualizar_mensaje_estado(obtener_mensaje_estado("recolectando"), id_burbuja)
             info = system_monitor.monitor_system()
             info_texto = "\n".join([f"{k}:\n{v}" for k, v in info.items()])
-            eel.actualizar_mensaje_estado(obtener_mensaje_estado("generando"), id_burbuja)
+
+            eel.mostrar_consola_comando(info_texto)
+
+            if sistema == "Windows":
+                mensaje_final = "🪟 Ejecución en Windows finalizada [✔]"
+            elif sistema == "Linux":
+                mensaje_final = "🐧 Ejecución en Linux finalizada [✔]"
+            else:
+                mensaje_final = f"🖥️ Ejecución en {sistema} finalizada [✔]"
+
             prompt_final = f"""🖥️ Información actual del sistema:\n{info_texto}\n\nUsuario: {username}\n\nPregunta del usuario:\n{prompt}"""
+
+            eel.actualizar_mensaje_estado(obtener_mensaje_estado("generando"), id_burbuja)
+            eel.mostrar_consola_comando(mensaje_final)
+
+
+        # Verificamos si se puede generar un script automáticamente
+        if es_tarea_automatizable(prompt):
+            eel.actualizar_mensaje_estado("🤖 Generando script automatizado...", id_burbuja)
+            # Añadir indicación del script según el SO, si no se especificó lenguaje
+            if not lenguaje_explicito_en_prompt(prompt):
+                if sistema == "Windows":
+                    prompt_final += "\n\nPor favor genera el script automatizable en formato de código para Windows (.bat o .ps1), dentro de triple backticks e indicando el tipo de archivo."
+                elif sistema == "Linux":
+                    prompt_final += "\n\nPor favor genera el script automatizable en formato de código para Linux (.sh), dentro de triple backticks e indicando el tipo de archivo."
+
+
 
         # Inicia el streaming
         stream = client.chat.completions.create(
@@ -145,6 +193,8 @@ def enviar_mensaje_stream(prompt):
         respuesta_raw = ""
         stream_vacio = True
 
+       # eel.ocultar_consola()
+
         for chunk in stream:
             if hasattr(chunk.choices[0].delta, "content"):
                 nuevo = chunk.choices[0].delta.content
@@ -152,12 +202,19 @@ def enviar_mensaje_stream(prompt):
                     stream_vacio = False
                 respuesta_raw += nuevo
                 eel.actualizar_respuesta_ai(convertir_markdown_a_html(respuesta_raw), id_burbuja)
+                if es_tarea_automatizable(prompt):
+                    bloques_codigo = re.findall(r"```(?:\w+\n)?(.*?)```", respuesta_raw, re.DOTALL)
+                    for bloque in bloques_codigo:
+                        eel.mostrar_consola_codigo("📜 Código generado:\n" + bloque.strip())
 
         if stream_vacio:
             eel.actualizar_respuesta_ai('<span style="color:red;">⚠️ No se recibió contenido de la IA. Intenta reformular tu pregunta.</span>', id_burbuja)
 
         eel.hide_typing_bubble()
         eel.finalizar_respuesta_ai("</div>", id_burbuja)
+
+        # Guardar el script si se detecta un bloque de código
+        script_generator.guardar_script_si_existe(respuesta_raw)
 
     except Exception as e:
         mensaje_error = str(e)

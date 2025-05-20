@@ -580,17 +580,53 @@ body {
   }
 
 
-  .terminal-sim {
-    background-color: #1e1e1e;
-    color: #00ff7f;
-    font-family: "Courier New", Courier, monospace;
-    font-size: 14px;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 10px;
-    box-shadow: 0 0 8px rgba(0, 255, 127, 0.5);
-    max-height: 300px;
-    overflow-y: auto;
-    white-space: pre-wrap;
+/* Terminal Estilizada */
+/* ───── Terminal embebida ───── */
+.terminal-box{
+  width: 500px;
+  margin: 10px auto 0;
+  background:#1e1e1e8c;
+  border:2px solid #444;
+  border-radius:8px;
+  font-family: 'Courier New', monospace;
+  box-shadow:0 0 12px rgba(255, 255, 255, 0.756);
+  overflow:hidden;
+  display: block;
 }
-  
+
+.terminal-head{
+  background:#333;
+  color:#eee;
+  font-weight:bold;
+  padding:6px 10px;
+  border-bottom:1px solid #555;
+}
+
+.terminal-body{
+  padding:10px 14px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  font-size:13px;
+  max-height: 1000px; /* Puedes ajustar esto */
+}
+
+.terminal-hidden{display:none;}
+.terminal-win {
+  color: #33ccff;
+  background-color: #0c0c0c;
+}
+
+.terminal-linux {
+  color: #33ff33;
+  background-color: #000;
+}
+
+.prompt-win {
+  color: #cccccc;
+}
+
+.prompt-linux {
+  color: #aaaaaa;
+}
+
+

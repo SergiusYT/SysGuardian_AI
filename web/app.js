@@ -1,6 +1,10 @@
 let chatDiv = document.getElementById("chat");
 let firstMessageSent = false;
 
+let terminalDebeEstarOculta = false;
+
+
+
 const preloadImage = new Image();
 preloadImage.src = "img/logo_neon.png";  
 
@@ -44,6 +48,7 @@ document.getElementById("send-button").addEventListener("click", async () => {
   }
 
   input.value = "";
+  
   await eel.enviar_mensaje_stream(prompt)();
 });
 
@@ -97,6 +102,8 @@ function nuevo_mensaje_usuario(html) {
 // 🤖 Inicia burbuja de respuesta IA
 eel.expose(iniciar_respuesta_ai);
 function iniciar_respuesta_ai(idBurbuja) {
+  terminalDebeEstarOculta = false;
+
   const container = document.createElement("div");
   container.className = "bubble-container writing"; // <-- ESTA CLASE DIFERENCIA QUE ESTÁ ESCRIBIENDO
   container.id = "typing-bubble";
@@ -231,8 +238,137 @@ function finalizar_respuesta_ai(cierre, idBurbuja) {
     bubbleContainer.classList.remove("writing");
     bubbleContainer.classList.add("done");
   }
+
 }
 
+function typeCommandLine(container, text, delay = 5) {
+    container.innerHTML = "";
+    let i = 0;
+
+    const interval = setInterval(() => {
+        container.innerHTML += text.charAt(i);
+        i++;
+        if (i >= text.length) clearInterval(interval);
+    }, delay);
+}
+
+
+
+eel.expose(mostrar_consola_comando);
+function mostrar_consola_comando(cmd, salida = "") {
+    if (terminalDebeEstarOculta) return;
+
+    const ultAiBubble = [...document.querySelectorAll(".bubble.ai")].pop();
+    if (!ultAiBubble) return;
+
+    let termBox = ultAiBubble.querySelector(".terminal-box");
+
+    if (!termBox) {
+        termBox = document.createElement("div");
+        termBox.className = "terminal-box";
+        termBox.innerHTML = `
+          <div class="terminal-head">Terminal</div>
+          <div class="terminal-body"></div>`;
+        ultAiBubble.appendChild(termBox); // ✅ ahora está dentro de la burbuja
+    }
+
+    const termBody = termBox.querySelector(".terminal-body");
+
+    // Detecta tipo de comando
+    const isWin = /(?:dir|cls|copy|ipconfig|netstat|wmic|powershell|query|🪟)/i.test(cmd);
+    const systemClass = isWin ? "terminal-win" : "terminal-linux";
+    const prompt = isWin ? `C:\\Users\\${nombreUsuario}>` : `${nombreUsuario}@host:~$`;
+
+    // Limpiar clases previas antes de aplicar la nueva
+    termBox.classList.remove("terminal-linux", "terminal-win", "terminal-hidden");
+    termBox.classList.add(systemClass);
+
+    // Limpiar contenido anterior (como lo hacías antes)
+    termBody.innerHTML = "";
+
+    // Crear bloque de comando
+    const block = document.createElement("div");
+    block.className = "command-block";
+    block.innerHTML = `
+      <span class="${isWin ? 'prompt-win' : 'prompt-linux'}">${prompt}</span><span class="cmd-anim"></span>
+      ${salida ? `<div class="output">${salida}</div>` : ""}
+    `;
+
+    termBody.appendChild(block);
+
+    const animSpan = block.querySelector(".cmd-anim");
+    typeCommandLine(animSpan, cmd);
+
+    // 🟢 Forzar scroll al final
+    setTimeout(() => {
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }, 50);
+}
+
+
+
+eel.expose(mostrar_consola_codigo);
+
+function mostrar_consola_codigo(cmd, salida = "") {
+    if (terminalDebeEstarOculta) return;
+
+    const ultAiBubble = [...document.querySelectorAll(".bubble.ai")].pop();
+    if (!ultAiBubble) return;
+
+    let termBox = ultAiBubble.querySelector(".terminal-box");
+
+    if (!termBox) {
+        termBox = document.createElement("div");
+        termBox.className = "terminal-box";
+        termBox.innerHTML = `
+          <div class="terminal-head">Terminal</div>
+          <div class="terminal-body"></div>`;
+        ultAiBubble.appendChild(termBox);
+    }
+
+    const termBody = termBox.querySelector(".terminal-body");
+
+    // Detecta tipo de comando
+    const isWin = /(?:dir|cls|copy|ipconfig|netstat|wmic|powershell|query|🪟)/i.test(cmd);
+    const systemClass = isWin ? "terminal-win" : "terminal-linux";
+    const prompt = isWin ? `C:\\Users\\${nombreUsuario}>` : `${nombreUsuario}@host:~$`;
+
+    // Limpiar clases previas antes de aplicar la nueva
+    termBox.classList.remove("terminal-linux", "terminal-win", "terminal-hidden");
+    termBox.classList.add(systemClass);
+
+    // ❌ Ya no borramos termBody.innerHTML aquí
+
+    // Crear bloque de comando
+    const block = document.createElement("div");
+    block.className = "command-block";
+    block.innerHTML = `
+      <span class="${isWin ? 'prompt-win' : 'prompt-linux'}">${prompt}</span><span class="cmd-anim"></span>
+      ${salida ? `<div class="output">${salida}</div>` : ""}
+    `;
+
+    termBody.appendChild(block);
+
+    const animSpan = block.querySelector(".cmd-anim");
+    typeCommandLine(animSpan, cmd);
+
+    setTimeout(() => {
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }, 50);
+}
+
+
+
+eel.expose(ocultar_consola);
+function ocultar_consola() {
+  terminalDebeEstarOculta = true;
+
+  document.querySelectorAll(".terminal-box").forEach(box => {
+    box.classList.add("terminal-hidden");
+    const body = box.querySelector(".terminal-body");
+    if (body) body.textContent = "";
+  });
+}
 
 
 

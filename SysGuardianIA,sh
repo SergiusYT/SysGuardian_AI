@@ -1,0 +1,9 @@
+#!/bin/bash
+# Este script lanza sysguardian.py en segundo plano en Linux
+
+echo "🔐 Lanzando SysGuardian AI..."
+
+# Ejecutar en segundo plano (como pythonw en Windows)
+nohup python3 sysguardian.py > sysguardian.log 2>&1 &
+
+chmod +x SysGuardianIA.sh

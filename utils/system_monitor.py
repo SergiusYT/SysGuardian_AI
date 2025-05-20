@@ -5,6 +5,17 @@ import os
 
 script_path = os.path.join("herramientas", "temperatura.ps1")
 
+import eel
+
+def run_command_with_display(cmd):
+    try:
+        eel.mostrar_consola_comando(cmd)  # Muestra el comando en la consola
+        result = subprocess.check_output(cmd, shell=True, stderr=subprocess.DEVNULL, universal_newlines=True)
+        return result.strip()
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 def obtener_temperatura_cpu():
     script_path = os.path.join("herramientas", "temperatura.ps1")
 
@@ -38,11 +49,11 @@ def run_command(cmd):
     except Exception as e:
         return f"Error: {str(e)}"
 
-from concurrent.futures import ProcessPoolExecutor, as_completed
 
 def monitor_system():
     os_name = platform.system()
     info = {}
+
 
     commands = {}
 
@@ -68,7 +79,6 @@ def monitor_system():
             "Users Logged In": "who",
             "Open Sessions": "w",
             "Insecure Permissions": "find / -perm -o+w 2>/dev/null | head -n 10",
-            "System Integrity": "aide --check || chkrootkit || rkhunter --check",
             "System Updates": "apt list --upgradable 2>/dev/null || dnf check-update",
             "Active Services": "systemctl list-units --type=service --state=running",
             "Antivirus Status": "clamscan -V || echo 'No antivirus info available'"
@@ -93,24 +103,16 @@ def monitor_system():
             "Firewall Status": 'powershell -Command "Get-NetFirewallProfile"',
             "Recent Logins": 'powershell -Command "Get-EventLog -LogName Security -InstanceId 4624 -Newest 5"',
             "Users Logged In": 'query user',
-            "System Integrity": 'sfc /scannow',
             "System Updates": 'powershell -Command "Get-WindowsUpdate"',
             "Active Services": 'powershell -Command "Get-Service | Where-Object {$_.Status -eq \'Running\'}"',
             "Antivirus Status": 'powershell -Command "Get-MpComputerStatus | Select-Object AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled"'
         }
 
-    # Procesamiento en paralelo
-    with ProcessPoolExecutor() as executor:
-        future_to_key = {executor.submit(run_command, cmd): key for key, cmd in commands.items()}
+    # 🔁 EJECUCIÓN SECUENCIAL DE CADA COMANDO
+    for key, cmd in commands.items():
+        info[key] = run_command_with_display(cmd)
 
-        for future in as_completed(future_to_key):
-            key = future_to_key[future]
-            try:
-                info[key] = future.result()
-            except Exception as e:
-                info[key] = f"Error ejecutando {key}: {e}"
-
-    # Llamar temperatura separada si estás en Windows (porque es una función personalizada)
+    # Ejecutar temperatura CPU personalizada si es Windows
     if os_name == "Windows":
         info["CPU Temp"] = obtener_temperatura_cpu()
 
